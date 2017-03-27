@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#define KRED  "\x1B[31m"
+
 #define SHL_RL_BUFSIZE 1024
 #define SHL_TOK_BUFSIZE 64
 #define SHL_TOK_DELIM " \t\r\n\a"
@@ -143,6 +145,8 @@ void shl_loop(void) {
     int status;
     char *line;
 	char **args;
+	
+	printf("\n%sWELCOME TO THE BETTER SHELL\n", KRED);
 
     do {
 		printf("> ");
