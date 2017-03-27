@@ -65,7 +65,11 @@ int shl_help(char **args) {
 }
 
 int shl_history(char **history) {
-    print_history(history);
+    int i;
+    for (i = 0; i < HISTORY_LENGTH-1; i++) {
+        printf("%s,", history[i]);
+    }
+    printf("\n");
 }
 
 int shl_exit(char **args) {
@@ -165,13 +169,6 @@ int add_line_to_history(char *line, char **history) {
     }
     strcpy(history[0], tmp_line);
     return 1;
-}
-
-void print_history(char** history) {
-    int i;
-    for (i = 0; i < HISTORY_LENGTH-1; i++) {
-        printf("%s,", history[i]);
-    }
 }
 
 void shl_loop(char *prompt) {
