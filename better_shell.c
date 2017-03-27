@@ -4,8 +4,14 @@
 #include <unistd.h>
 #include <string.h>
 
+<<<<<<< HEAD
 #define BOLD_RED  "\033[1m\033[31m"
+=======
+#define TEXT_RED     "\033[31m"
+#define TEXT_DEFAULT "\033[0m"
+>>>>>>> 0ff2ffa337f245c32fdd3e1f11077ac9c6e2db77
 
+#define HISTORY_LENGTH 10
 #define SHL_RL_BUFSIZE 1024
 #define SHL_TOK_BUFSIZE 64
 #define SHL_TOK_DELIM " \t\r\n\a"
@@ -20,17 +26,20 @@
 int shl_cd(char **args);
 int shl_help(char **args);
 int shl_exit(char **args);
+int shl_history(char **args);
 
 char *builtin_str[] = {
 	"cd",
 	"help",
-	"exit"
+	"exit",
+    "history"
 };
 
 int (*builtin_func[]) (char **) = {
 	&shl_cd,
 	&shl_help,
-	&shl_exit
+	&shl_exit,
+    &shl_history
 };
 
 int shl_num_builtins() {
@@ -54,11 +63,18 @@ int shl_help(char **args) {
 	printf("The following commands are built-in:\n");
 
 	for(i = 0; i < shl_num_builtins(); i++) {
-		printf("	%s\n", builtin_str[i]);
+		printf("\t> %s\n", builtin_str[i]);
 	}
 	return 1;
 }
 
+int shl_history(char **history) {
+    int i;
+    for (i = 0; i < HISTORY_LENGTH-1; i++) {
+        printf("%s,", history[i]);
+    }
+    printf("\n");
+}
 
 int shl_exit(char **args) {
 	return 0;
@@ -119,7 +135,7 @@ int shl_launch(char **args) {
 		//parent
 		do {
 			wpid = waitpid(pid, &status, WUNTRACED);
-		}while(!WIFEXITED(status) && !WIFSIGNALED(status));
+		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
 	}
 	return 1;
 }
@@ -139,11 +155,30 @@ int shl_execute(char **args) {
 	return shl_launch(args);
 }
 
+int add_line_to_history(char *line, char **history) {
+    int i;
+    char tmp_line[255];    
 
+    strcpy(tmp_line, line);
+    tmp_line[strlen(tmp_line)-1] = 0;
 
-void shl_loop(void) {
+    for (i = HISTORY_LENGTH-1; i >= 0; --i) {
+        if (strcmp(history[i], "") == 0) {
+            strcpy(history[i], tmp_line);
+            return 1;
+        } 
+    }
+    for (i = HISTORY_LENGTH-1; i >= 1; --i) {
+        strcpy(history[i], history[i-1]);
+    }
+    strcpy(history[0], tmp_line);
+    return 1;
+}
+
+void shl_loop(char *prompt) {
     int status;
     char *line;
+<<<<<<< HEAD
 	char **args;
 	char cwd[1024];
 	
@@ -162,11 +197,38 @@ void shl_loop(void) {
 			return;
 		}
 		
+=======
+    char **args;
+
+    int i;
+    char **history;
+    history = (char **) calloc (HISTORY_LENGTH, sizeof(char*));
+    for (i = 0; i < HISTORY_LENGTH; i++) {
+        history[i] = (char*) calloc (255, sizeof(char));
+    }     
+
+    if (prompt == NULL) prompt = ">";
+
+	printf("\e[1;1H\e[2JWELCOME TO THE " TEXT_RED "BETTER " TEXT_DEFAULT "SHELL\n\n");
+
+    do {
+        printf(TEXT_RED "%s " TEXT_DEFAULT, prompt);
+        line = shl_read_line();                          // Read input
+        add_line_to_history(line, history);             // Add input to history
+        args = shl_split_line(line);
+        status = shl_execute(args);
+        free(line);
+        free(args);
+>>>>>>> 0ff2ffa337f245c32fdd3e1f11077ac9c6e2db77
 	} while(status);
+    for (i = 0; i < HISTORY_LENGTH; i++) {
+        free(history[i]);
+    }
+    free(history);
 }
 
 int main(int argc, char **argv) {
-    shl_loop();
+    shl_loop(argv[1]);
     return 0;
 }
 
