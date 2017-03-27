@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#define KRED  "\x1B[31m"
+#define BOLD_RED  "\033[1m\033[31m"
 
 #define SHL_RL_BUFSIZE 1024
 #define SHL_TOK_BUFSIZE 64
@@ -145,16 +145,23 @@ void shl_loop(void) {
     int status;
     char *line;
 	char **args;
+	char cwd[1024];
 	
-	printf("\n%sWELCOME TO THE BETTER SHELL\n", KRED);
+	printf("\n%sWELCOME TO THE BETTER SHELL\n", BOLD_RED);
 
     do {
-		printf("> ");
-		line = shl_read_line();
-		args = shl_split_line(line);
-		status = shl_execute(args);
-		free(line);
-		free(args);
+		if(getcwd(cwd, sizeof(cwd)) != NULL) {
+			fprintf(stdout, "%s > ", cwd);		
+			line = shl_read_line();
+			args = shl_split_line(line);
+			status = shl_execute(args);
+			free(line);
+			free(args);		
+		} else {
+			perror("getcwd() error");
+			return;
+		}
+		
 	} while(status);
 }
 
