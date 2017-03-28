@@ -28,43 +28,43 @@ int shl_history();
 char **history;
 
 char *builtin_str[] = {
-	"cd",
-	"help",
-	"exit",
+    "cd",
+    "help",
+    "exit",
     "history"
 };
 
 int (*builtin_func[]) (char **) = {
-	&shl_cd,
-	&shl_help,
-	&shl_exit,
+    &shl_cd,
+    &shl_help,
+    &shl_exit,
     &shl_history
 };
 
 int shl_num_builtins() {
-	return sizeof(builtin_str) / sizeof(char *);
+    return sizeof(builtin_str) / sizeof(char *);
 }
 
 int shl_cd(char **args) {
-	if(args[1] == NULL) {
-		fprintf(stderr, "shl: expected arg to \"cd\"\n");
-	} else {
-		if(chdir(args[1]) != 0) {
-			perror("shl");
-		}
-	}
-	return 1;
+    if(args[1] == NULL) {
+        fprintf(stderr, "shl: expected arg to \"cd\"\n");
+    } else {
+        if(chdir(args[1]) != 0) {
+            perror("shl");
+        }
+    }
+    return 1;
 }
 
 int shl_help(char **args) {
-	int i;
-	printf("Chris & Jared's SHELL\n");
-	printf("The following commands are built-in:\n");
+    int i;
+    printf("Chris & Jared's SHELL\n");
+    printf("The following commands are built-in:\n");
 
-	for(i = 0; i < shl_num_builtins(); i++) {
-		printf("\t> %s\n", builtin_str[i]);
-	}
-	return 1;
+    for(i = 0; i < shl_num_builtins(); i++) {
+        printf("\t> %s\n", builtin_str[i]);
+    }
+    return 1;
 }
 
 int shl_history() {
@@ -78,16 +78,16 @@ int shl_history() {
 }
 
 int shl_exit(char **args) {
-	return 0;
+    return 0;
 }
 
 
 char *shl_read_line(void) {
-	char *line = NULL;
-	ssize_t bufsize = 0;
-	getline(&line, &bufsize, stdin);
+    char *line = NULL;
+    ssize_t bufsize = 0;
+    getline(&line, &bufsize, stdin);
     add_line_to_history(line);             // Add input to history
-	return line;
+    return line;
 }
 
 char **shl_split_line(char *line) {
