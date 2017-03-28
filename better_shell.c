@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#define BOLD_RED  "\033[1m\033[31m"
+#define TEXT_BOLD_RED  "\033[1m\033[31m"
 #define TEXT_DEFAULT "\033[0m"
 
 
@@ -23,66 +23,71 @@
 int shl_cd(char **args);
 int shl_help(char **args);
 int shl_exit(char **args);
-//int shl_history(char **args);
+int shl_history();
+
+char **history;
 
 char *builtin_str[] = {
-	"cd",
-	"help",
-	"exit"
-  //  "history"
+    "cd",
+    "help",
+    "exit",
+    "history"
 };
 
 int (*builtin_func[]) (char **) = {
-	&shl_cd,
-	&shl_help,
-	&shl_exit
- //   &shl_history
+    &shl_cd,
+    &shl_help,
+    &shl_exit,
+    &shl_history
 };
 
 int shl_num_builtins() {
-	return sizeof(builtin_str) / sizeof(char *);
+    return sizeof(builtin_str) / sizeof(char *);
 }
 
 int shl_cd(char **args) {
-	if(args[1] == NULL) {
-		fprintf(stderr, "shl: expected arg to \"cd\"\n");
-	} else {
-		if(chdir(args[1]) != 0) {
-			perror("shl");
-		}
-	}
-	return 1;
+    if(args[1] == NULL) {
+        fprintf(stderr, "shl: expected arg to \"cd\"\n");
+    } else {
+        if(chdir(args[1]) != 0) {
+            perror("shl");
+        }
+    }
+    return 1;
 }
 
 int shl_help(char **args) {
-	int i;
-	printf("Chris & Jared's SHELL\n");
-	printf("The following commands are built-in:\n");
+    int i;
+    printf("Chris & Jared's SHELL\n");
+    printf("The following commands are built-in:\n");
 
-	for(i = 0; i < shl_num_builtins(); i++) {
-		printf("\t> %s\n", builtin_str[i]);
-	}
-	return 1;
+    for(i = 0; i < shl_num_builtins(); i++) {
+        printf("\t> %s\n", builtin_str[i]);
+    }
+    return 1;
 }
 
-int shl_history(char **history) {
+int shl_history() {
     int i;
-    for (i = 0; i < HISTORY_LENGTH-1; i++) {
-        printf("%s,", history[i]);
+    for (i = HISTORY_LENGTH-1; i >= 0; i--) {
+        if (strcmp(history[i], "")) {
+            printf("%d. %s\n", (HISTORY_LENGTH-i), history[i]);
+        }
     }
     printf("\n");
 }
 
 int shl_exit(char **args) {
-	return 0;
+    return 0;
 }
 
 
 char *shl_read_line(void) {
-	char *line = NULL;
-	ssize_t bufsize = 0;
-	getline(&line, &bufsize, stdin);
-	return line;
+    char *line = NULL;
+    ssize_t bufsize = 0;
+    getline(&line, &bufsize, stdin);
+    add_line_to_history(line);             // Add input to history
+    return line;
 }
 
 char **shl_split_line(char *line) {
@@ -124,7 +129,6 @@ int shl_launch(char **args) {
 			perror("shl");
 		}
 		exit(EXIT_FAILURE);
-
 	} else if(pid < 0) {
 		//error forking
 		perror("shl");
@@ -152,7 +156,7 @@ int shl_execute(char **args) {
 	return shl_launch(args);
 }
 
-int add_line_to_history(char *line, char **history) {
+int add_line_to_history(char *line) {
     int i;
     char tmp_line[255];    
 
@@ -172,7 +176,7 @@ int add_line_to_history(char *line, char **history) {
     return 1;
 }
 
-void shl_loop(char *prompt) {
+void shl_loop() {
     int status;
     char *line;
 
@@ -180,17 +184,11 @@ void shl_loop(char *prompt) {
 	char cwd[1024];
 
     int i;
-    char **history;
-    history = (char **) calloc (HISTORY_LENGTH, sizeof(char*));
-    for (i = 0; i < HISTORY_LENGTH; i++) {
-        history[i] = (char*) calloc (255, sizeof(char));
-    }     
 
-    if (prompt == NULL) prompt = ">";
-
-	printf("\e[1;1H\e[2JWELCOME TO THE " BOLD_RED "BETTER " TEXT_DEFAULT "SHELL\n\n");
+	printf("\e[1;1H\e[2JWELCOME TO THE " TEXT_BOLD_RED "BETTER " TEXT_DEFAULT "SHELL\n\n");
 
     do {
+<<<<<<< HEAD
 		if(getcwd(cwd, sizeof(cwd)) != NULL) {
 			fprintf(stdout, BOLD_RED "%s"TEXT_DEFAULT" %s " , cwd, prompt);
 	        line = shl_read_line();                          // Read input
@@ -203,15 +201,35 @@ void shl_loop(char *prompt) {
 			perror("getcwd() error");
 			return;
 		}
+=======
+        if (getcwd(cwd, sizeof(cwd)) == NULL) {
+            perror("getcwd() error");
+            return;
+        }
+        char *prompt;
+        prompt = strcat(cwd, " ->");
+        fprintf(stdout, TEXT_BOLD_RED "%s " TEXT_DEFAULT, prompt);
+        line = shl_read_line();                         // Read input
+        args = shl_split_line(line);
+        status = shl_execute(args);
+        free(line);
+        free(args);
+>>>>>>> 7279592a256b428167bcc7115cd119107651e405
 	} while(status);
+    
+    // Free history
     for (i = 0; i < HISTORY_LENGTH; i++) {
         free(history[i]);
-    }
-    free(history);
+    } free(history);
 }
 
 int main(int argc, char **argv) {
-    shl_loop(argv[1]);
+    history = (char **) calloc (HISTORY_LENGTH, sizeof(char*));
+    int i;
+    for (i = 0; i < HISTORY_LENGTH; i++) {
+        history[i] = (char*) calloc (255, sizeof(char));
+    }
+    shl_loop();
     return 0;
 }
 
