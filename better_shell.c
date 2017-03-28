@@ -192,7 +192,7 @@ void shl_loop(char *prompt) {
 
     do {
 		if(getcwd(cwd, sizeof(cwd)) != NULL) {
-			fprintf(stdout, BOLD_RED "%s"TEXT_DEFAULT" %s" , cwd, prompt);
+			fprintf(stdout, BOLD_RED "%s"TEXT_DEFAULT" %s " , cwd, prompt);
 	        line = shl_read_line();                          // Read input
 	        add_line_to_history(line, history);             // Add input to history
 	        args = shl_split_line(line);
