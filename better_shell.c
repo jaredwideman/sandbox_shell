@@ -4,12 +4,9 @@
 #include <unistd.h>
 #include <string.h>
 
-<<<<<<< HEAD
 #define BOLD_RED  "\033[1m\033[31m"
-=======
-#define TEXT_RED     "\033[31m"
 #define TEXT_DEFAULT "\033[0m"
->>>>>>> 0ff2ffa337f245c32fdd3e1f11077ac9c6e2db77
+
 
 #define HISTORY_LENGTH 10
 #define SHL_RL_BUFSIZE 1024
@@ -26,20 +23,20 @@
 int shl_cd(char **args);
 int shl_help(char **args);
 int shl_exit(char **args);
-int shl_history(char **args);
+//int shl_history(char **args);
 
 char *builtin_str[] = {
 	"cd",
 	"help",
-	"exit",
-    "history"
+	"exit"
+  //  "history"
 };
 
 int (*builtin_func[]) (char **) = {
 	&shl_cd,
 	&shl_help,
-	&shl_exit,
-    &shl_history
+	&shl_exit
+ //   &shl_history
 };
 
 int shl_num_builtins() {
@@ -178,27 +175,9 @@ int add_line_to_history(char *line, char **history) {
 void shl_loop(char *prompt) {
     int status;
     char *line;
-<<<<<<< HEAD
-	char **args;
-	char cwd[1024];
-	
-	printf("\n%sWELCOME TO THE BETTER SHELL\n", BOLD_RED);
 
-    do {
-		if(getcwd(cwd, sizeof(cwd)) != NULL) {
-			fprintf(stdout, "%s > ", cwd);		
-			line = shl_read_line();
-			args = shl_split_line(line);
-			status = shl_execute(args);
-			free(line);
-			free(args);		
-		} else {
-			perror("getcwd() error");
-			return;
-		}
-		
-=======
     char **args;
+	char cwd[1024];
 
     int i;
     char **history;
@@ -209,17 +188,21 @@ void shl_loop(char *prompt) {
 
     if (prompt == NULL) prompt = ">";
 
-	printf("\e[1;1H\e[2JWELCOME TO THE " TEXT_RED "BETTER " TEXT_DEFAULT "SHELL\n\n");
+	printf("\e[1;1H\e[2JWELCOME TO THE " BOLD_RED "BETTER " TEXT_DEFAULT "SHELL\n\n");
 
     do {
-        printf(TEXT_RED "%s " TEXT_DEFAULT, prompt);
-        line = shl_read_line();                          // Read input
-        add_line_to_history(line, history);             // Add input to history
-        args = shl_split_line(line);
-        status = shl_execute(args);
-        free(line);
-        free(args);
->>>>>>> 0ff2ffa337f245c32fdd3e1f11077ac9c6e2db77
+		if(getcwd(cwd, sizeof(cwd)) != NULL) {
+			fprintf(stdout, BOLD_RED "%s"TEXT_DEFAULT" %s" , cwd, prompt);
+	        line = shl_read_line();                          // Read input
+	        add_line_to_history(line, history);             // Add input to history
+	        args = shl_split_line(line);
+	        status = shl_execute(args);
+	        free(line);
+	        free(args);
+		} else {
+			perror("getcwd() error");
+			return;
+		}
 	} while(status);
     for (i = 0; i < HISTORY_LENGTH; i++) {
         free(history[i]);
