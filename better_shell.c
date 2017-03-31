@@ -24,7 +24,11 @@ int shl_cd(char **args);
 int shl_help(char **args);
 int shl_exit(char **args);
 int shl_history();
+<<<<<<< HEAD
 int add_line_to_history(char *line);
+=======
+int add_line_to_history();
+>>>>>>> 71f71bee647dc5ee3d91341ef5785820e81c83a9
 
 char **history;
 
