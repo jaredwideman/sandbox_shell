@@ -24,6 +24,7 @@ int shl_cd(char **args);
 int shl_help(char **args);
 int shl_exit(char **args);
 int shl_history();
+int add_line_to_history();
 
 char **history;
 
@@ -188,20 +189,6 @@ void shl_loop() {
 	printf("\e[1;1H\e[2JWELCOME TO THE " TEXT_BOLD_RED "BETTER " TEXT_DEFAULT "SHELL\n\n");
 
     do {
-<<<<<<< HEAD
-		if(getcwd(cwd, sizeof(cwd)) != NULL) {
-			fprintf(stdout, BOLD_RED "%s"TEXT_DEFAULT" %s " , cwd, prompt);
-	        line = shl_read_line();                          // Read input
-	        add_line_to_history(line, history);             // Add input to history
-	        args = shl_split_line(line);
-	        status = shl_execute(args);
-	        free(line);
-	        free(args);
-		} else {
-			perror("getcwd() error");
-			return;
-		}
-=======
         if (getcwd(cwd, sizeof(cwd)) == NULL) {
             perror("getcwd() error");
             return;
@@ -214,7 +201,6 @@ void shl_loop() {
         status = shl_execute(args);
         free(line);
         free(args);
->>>>>>> 7279592a256b428167bcc7115cd119107651e405
 	} while(status);
     
     // Free history
