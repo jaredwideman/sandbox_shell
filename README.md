@@ -3,4 +3,4 @@ A unix shell that trumps all others.
 
 LIST OF SHIT TO DO:
 
-- Link modules to shell
+- Maybe clean up code in shell... other than that we're done
