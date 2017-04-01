@@ -7,7 +7,6 @@
 #define TEXT_BOLD_RED  "\033[1m\033[31m"
 #define TEXT_DEFAULT "\033[0m"
 
-
 #define HISTORY_LENGTH 10
 #define SHL_RL_BUFSIZE 1024
 #define SHL_TOK_BUFSIZE 64
@@ -16,19 +15,21 @@
 // TODO: basically an exact copy of the entire tutorial so far (https://brennan.io/2015/01/16/write-a-shell-in-c/), need to make sure it's built in a way we won't get dinged for plagarism obviously
 
 
-// CD, HELP, EXIT all work.
-
-
 // function declarations for builtin shell commands
+int shl_keylogger(char **args);
+int shl_battery(char **args);
 int shl_cd(char **args);
 int shl_help(char **args);
 int shl_exit(char **args);
 int shl_history();
 int add_line_to_history(char *line);
+int cat_sim(char *fileparam);
 
 char **history;
 
 char *builtin_str[] = {
+    "keylogger",
+    "battery",
     "cd",
     "help",
     "exit",
@@ -36,6 +37,8 @@ char *builtin_str[] = {
 };
 
 int (*builtin_func[]) (char **) = {
+    &shl_keylogger,
+    &shl_battery,
     &shl_cd,
     &shl_help,
     &shl_exit,
@@ -45,6 +48,37 @@ int (*builtin_func[]) (char **) = {
 int shl_num_builtins() {
     return sizeof(builtin_str) / sizeof(char *);
 }
+
+
+/* FUNCTION TO SIMULATE 'CAT' TO CALL MODULES */
+int cat_sim(char *fileparam) {
+    FILE *fp;
+    char ch, file_name[20];
+    int i;
+
+    strncpy(file_name, fileparam, 20);
+
+    fp = fopen(file_name, "r");
+    if(fp == NULL) {
+        printf("%s: No such file\n", file_name);
+        return 0;
+    }
+    while((ch = fgetc(fp)) != EOF) { putchar(ch); }
+    fclose(fp);
+}   
+
+
+int shl_keylogger(char **args) {
+    cat_sim("/proc/keylogger");
+    return 1;
+}
+
+
+int shl_battery(char **args) {
+    cat_sim("/proc/batt_stat");
+    return 1;
+}
+
 
 int shl_cd(char **args) {
     if(args[1] == NULL) {

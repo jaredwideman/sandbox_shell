@@ -28,9 +28,9 @@ static ssize_t batt_stat_read(struct file *file, char __user *buffer, size_t cou
 	int length = 0;
     char name[] = "BAT0";
     int result = 0;
-    int curr_energy = 0;
-    int max_energy = 0;
-    int batt_perc = 0;
+    unsigned int curr_energy = 0;
+    unsigned int max_energy = 0;
+    unsigned int batt_perc = 0;
     struct power_supply *p_supp;
     union power_supply_propval currcharge, chargefull;
 
@@ -55,7 +55,7 @@ static ssize_t batt_stat_read(struct file *file, char __user *buffer, size_t cou
         
     }
 
-    length += sprintf(buffer+length, "***********************\n");
+    length += sprintf(buffer+length, "***********************************\n");
 
     batt_perc = (curr_energy * 100) / max_energy;
 

