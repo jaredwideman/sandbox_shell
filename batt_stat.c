@@ -50,13 +50,8 @@ static ssize_t batt_stat_read(struct file *file, char __user *buffer, size_t cou
     result = power_supply_get_property(p_supp, POWER_SUPPLY_PROP_CHARGE_FULL, &chargefull);
 
     if(!result) {
-<<<<<<< HEAD:battery_mod/batt_stat.c
         length += sprintf(buffer+length, "MAX ENERGY:\t\t%d Wh\n", chargefull.intval/1000000);
         max_energy = chargefull.intval/10000;     
-=======
-        length += sprintf(buffer+length, "MAX ENERGY:\t\t%d Wh\n", chargefull.intval);
-        max_energy = chargefull.intval;
->>>>>>> 0689e7916f96130fbe62c281f0c5316221770109:batt_stat.c
     }
 
     length += sprintf(buffer+length, "***********************************\n");
