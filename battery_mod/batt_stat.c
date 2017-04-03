@@ -38,26 +38,25 @@ static ssize_t batt_stat_read(struct file *file, char __user *buffer, size_t cou
 
     if(*pos != 0) { return 0; }	
 
-   length += sprintf(buffer+length, "\n*** BATTERY DATA ***\n");
+    length += sprintf(buffer+length, "\n*** BATTERY DATA ***\n");
 
     result = power_supply_get_property(p_supp, POWER_SUPPLY_PROP_CHARGE_NOW, &currcharge);
 
     if(!result) {
-        length += sprintf(buffer+length, "CURRENT ENERGY LEVEL:\t%d Wh\n", currcharge.intval);
-        curr_energy = currcharge.intval;
+        length += sprintf(buffer+length, "CURRENT ENERGY LEVEL:\t%d Wh\n", currcharge.intval/1000000);
+        curr_energy = currcharge.intval/10000;
     }
 
     result = power_supply_get_property(p_supp, POWER_SUPPLY_PROP_CHARGE_FULL, &chargefull);
 
     if(!result) {
-        length += sprintf(buffer+length, "MAX ENERGY:\t\t%d Wh\n", chargefull.intval);
-        max_energy = chargefull.intval;
-        
+        length += sprintf(buffer+length, "MAX ENERGY:\t\t%d Wh\n", chargefull.intval/1000000);
+        max_energy = chargefull.intval/10000;     
     }
 
     length += sprintf(buffer+length, "***********************************\n");
 
-    batt_perc = (curr_energy * 100) / max_energy;
+    batt_perc = ((curr_energy * 100) + (max_energy/2)) / max_energy;
 
 
     length += sprintf(buffer+length, "BATTERY PERCENTAGE:\t%d %%\n", batt_perc);
