@@ -16,14 +16,14 @@
 
 
 // function declarations for builtin shell commands
-int shl_keylogger(char **args);
-int shl_battery(char **args);
+int shl_keylogger();
+int shl_battery();
 int shl_cd(char **args);
 int shl_help(char **args);
 int shl_exit(char **args);
 int shl_history();
 int add_line_to_history(char *line);
-int cat_sim(char *fileparam);
+int cat_sim(char *fileparam, FILE*);
 
 char **history;
 
@@ -49,34 +49,54 @@ int shl_num_builtins() {
     return sizeof(builtin_str) / sizeof(char *);
 }
 
-
-/* FUNCTION TO SIMULATE 'CAT' TO CALL MODULES */
-int cat_sim(char *fileparam) {
-    FILE *fp;
-    char ch, file_name[20];
+int check_mod_existence(char *filename, FILE *fp) {
+    char ch;
     int i;
-
-    strncpy(file_name, fileparam, 20);
-
-    fp = fopen(file_name, "r");
-    if(fp == NULL) {
-        printf("%s: No such file\n", file_name);
-        return 0;
-    }
-    while((ch = fgetc(fp)) != EOF) { putchar(ch); }
-    fclose(fp);
-}   
-
-
-int shl_keylogger(char **args) {
-    cat_sim("/proc/keylogger");
+    if (fp == NULL) return -1;
     return 1;
 }
 
+/* FUNCTION TO SIMULATE 'CAT' TO CALL MODULES */
+int cat_sim(char *fileparam, FILE *fp) {
+    char ch;
+    while((ch = fgetc(fp)) != EOF) { putchar(ch); }
+}
 
-int shl_battery(char **args) {
-    cat_sim("/proc/batt_stat");
-    return 1;
+int s_insmod(char *filename) {
+    char buffer[50];
+    snprintf(buffer, sizeof(buffer), "sudo insmod %s", filename);
+    return system(buffer);
+}
+
+int shl_keylogger() {
+    FILE *fp;
+    char location[30] = "/proc/keylogger";
+    fp = fopen(location, "r");
+    int exists = check_mod_existence(location, fp);
+    if (exists == -1) {
+        printf("Module doesn't exist. Automatically adding module to kernel. Please rerun command.\n");
+        s_insmod("keylogger.ko");
+        return -1;
+    }
+    int ret = cat_sim(location, fp);
+    fclose(fp);
+    return ret;
+}
+
+
+int shl_battery() {
+    FILE *fp;
+    char location[30] = "/proc/batt_stat";
+    fp = fopen(location, "r");
+    int exists = check_mod_existence(location, fp);
+    if (exists == -1) {
+        printf("Module doesn't exist. Automatically adding module to kernel. Please rerun command.\n");
+        s_insmod("batt_stat.ko");
+        return -1;
+    }
+    int ret = cat_sim(location, fp);
+    fclose(fp);
+    return ret;
 }
 
 
