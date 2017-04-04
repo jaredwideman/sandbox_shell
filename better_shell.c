@@ -145,6 +145,28 @@ char *shl_read_line(void) {
     return line;
 }
 
+
+/* slight variation to :
+
+    http://www.csl.mtu.edu/cs4411.ck/www/NOTES/process/fork/exec.html 
+
+*/
+char **line_parse(char *line) {
+    int pos = 0;
+    char **args = malloc(100 * sizeof(char*));
+    while(*line != '\0') {
+        while(*line == ' ' || *line == '\t' || *line == '\n') {
+            *line++ = '\0';
+        }
+        args[pos++] = line;
+        while(*line != '\0' && *line != ' ' && *line != '\t' && *line != '\n')
+            line++;
+    }
+    args[pos] = '\0';
+    return args;
+}
+
+
 char **shl_split_line(char *line) {
 	int bufsize = SHL_TOK_BUFSIZE, pos = 0;
 	char **tokens = malloc(bufsize * sizeof(char*));
@@ -251,7 +273,8 @@ void shl_loop() {
         prompt = strcat(cwd, " ->");
         fprintf(stdout, TEXT_BOLD_RED "%s " TEXT_DEFAULT, prompt);
         line = shl_read_line();                         // Read input
-        args = shl_split_line(line);
+        //args = shl_split_line(line);
+        args = line_parse(line);        
         status = shl_execute(args);
         free(line);
         free(args);
