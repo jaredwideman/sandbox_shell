@@ -113,7 +113,7 @@ int shl_cd(char **args) {
 
 int shl_help(char **args) {
     int i;
-    printf("Chris & Jared's SHELL\n");
+    printf("Chris & Jared's BETTER_SHELL\n");
     printf("The following commands are built-in:\n");
 
     for(i = 0; i < shl_num_builtins(); i++) {
